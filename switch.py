@@ -251,4 +251,9 @@ class AutomationSwitch(CoordinatorEntity[ReptileHabitatCoordinator], SwitchEntit
             heat_data = self.coordinator.data["heat_sources"].get(self._heat_source_index)
             if heat_data:
                 switch_entity = heat_data.get("switch_entity")
-                if switch
+                if switch_entity:
+                    await self.hass.services.async_call(
+                        "switch", "turn_off", {"entity_id": switch_entity}
+                    )
+                    # Set manual override
+                    self.coordinator.set_manual_override(self._heat_source_index, True)

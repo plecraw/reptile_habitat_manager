@@ -1,0 +1,74 @@
+log_feeding:
+  name: Log Feeding
+  description: Log a feeding event for the reptile
+  fields:
+    food_type:
+      name: Food Type
+      description: Type of food given (e.g., "Mouse", "Rat", "Cricket")
+      required: true
+      selector:
+        text:
+    food_size:
+      name: Food Size
+      description: Size of food given (e.g., "Adult", "Fuzzy", "Pinkie")
+      required: true
+      selector:
+        text:
+    notes:
+      name: Notes
+      description: Additional notes about feeding
+      required: false
+      selector:
+        text:
+          multiline: true
+
+log_shedding:
+  name: Log Shedding
+  description: Log a shedding event for the reptile
+  fields:
+    complete:
+      name: Shed Complete
+      description: Whether the shed was complete
+      required: true
+      selector:
+        boolean:
+    notes:
+      name: Notes
+      description: Additional notes about shedding
+      required: false
+      selector:
+        text:
+          multiline: true
+
+log_weight:
+  name: Log Weight
+  description: Log a weight measurement for the reptile
+  fields:
+    weight:
+      name: Weight
+      description: Weight measurement
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 10000
+          step: 0.1
+    unit:
+      name: Unit
+      description: Unit of measurement
+      required: false
+      default: "g"
+      selector:
+        select:
+          options:
+            - "g"
+            - "kg"
+            - "oz"
+            - "lb"
+    notes:
+      name: Notes
+      description: Additional notes about weighing
+      required: false
+      selector:
+        text:
+          multiline: true

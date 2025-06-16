@@ -132,4 +132,129 @@ class HeatSourceClimate(CoordinatorEntity[ReptileHabitatCoordinator], ClimateEnt
     @property
     def supported_features(self) -> ClimateEntityFeature:
         """Return supported features."""
-        return Climate
+        return ClimateEntityFeature.TARGET_TEMPERATURE_RANGE
+
+    @property
+    def extra_state_attributes(self) -> dict[str, any]:
+        """Return extra state attributes."""
+        if not self.coordinator.data:
+            return {}
+            
+        heat_data = self.coordinator.data["heat_sources"].get(self._heat_source_index, {})
+        return {
+            "critical_min": heat_data.get("critical_min"),
+            "critical_max": heat_data.get("critical_max"),
+            "status": heat_data.get("status"),
+            "switch_entity": heat_data.get("switch_entity"),
+            "sensor_entity": heat_data.get("sensor_entity"),
+        }
+
+
+class AtmosphereClimate(CoordinatorEntity[ReptileHabitatCoordinator], ClimateEntity):
+    """Climate entity for tank atmosphere."""
+
+    def __init__(
+        self,
+        coordinator: ReptileHabitatCoordinator,
+        entry: ConfigEntry,
+    ) -> None:
+        """Initialize the atmosphere climate entity."""
+        super().__init__(coordinator)
+        self._entry = entry
+        self._attr_has_entity_name = True
+
+    @property
+    def unique_id(self) -> str:
+        """Return unique ID."""
+        return f"{self._entry.entry_id}_atmosphere"
+
+    @property
+    def name(self) -> str:
+        """Return the name."""
+        return f"{self.coordinator.reptile_name} Tank Atmosphere"
+
+    @property
+    def temperature_unit(self) -> str:
+        """Return the unit of measurement."""
+        return UnitOfTemperature.FAHRENHEIT
+
+    @property
+    def current_temperature(self) -> float | None:
+        """Return the current temperature."""
+        if self.coordinator.data:
+            atmosphere_data = self.coordinator.data.get("atmosphere", {})
+            return atmosphere_data.get("current_temp")
+        return None
+
+    @property
+    def current_humidity(self) -> float | None:
+        """Return the current humidity."""
+        if self.coordinator.data:
+            atmosphere_data = self.coordinator.data.get("atmosphere", {})
+            return atmosphere_data.get("current_humidity")
+        return None
+
+    @property
+    def target_temperature(self) -> float | None:
+        """Return the target temperature."""
+        if self.coordinator.data:
+            atmosphere_data = self.coordinator.data.get("atmosphere", {})
+            target_min = atmosphere_data.get("target_min_temp", 75)
+            target_max = atmosphere_data.get("target_max_temp", 85)
+            return (target_min + target_max) / 2
+        return None
+
+    @property
+    def target_temperature_high(self) -> float | None:
+        """Return the high target temperature."""
+        if self.coordinator.data:
+            atmosphere_data = self.coordinator.data.get("atmosphere", {})
+            return atmosphere_data.get("target_max_temp")
+        return None
+
+    @property
+    def target_temperature_low(self) -> float | None:
+        """Return the low target temperature."""
+        if self.coordinator.data:
+            atmosphere_data = self.coordinator.data.get("atmosphere", {})
+            return atmosphere_data.get("target_min_temp")
+        return None
+
+    @property
+    def hvac_mode(self) -> HVACMode:
+        """Return current HVAC mode."""
+        return HVACMode.AUTO
+
+    @property
+    def hvac_modes(self) -> list[HVACMode]:
+        """Return available HVAC modes."""
+        return [HVACMode.AUTO]
+
+    @property
+    def hvac_action(self) -> HVACAction:
+        """Return current HVAC action."""
+        return HVACAction.IDLE
+
+    @property
+    def supported_features(self) -> ClimateEntityFeature:
+        """Return supported features."""
+        return ClimateEntityFeature.TARGET_TEMPERATURE_RANGE
+
+    @property
+    def extra_state_attributes(self) -> dict[str, any]:
+        """Return extra state attributes."""
+        if not self.coordinator.data:
+            return {}
+            
+        atmosphere_data = self.coordinator.data.get("atmosphere", {})
+        return {
+            "current_humidity": atmosphere_data.get("current_humidity"),
+            "target_min_humidity": atmosphere_data.get("target_min_humidity"),
+            "target_max_humidity": atmosphere_data.get("target_max_humidity"),
+            "critical_min_humidity": atmosphere_data.get("critical_min_humidity"),
+            "critical_max_humidity": atmosphere_data.get("critical_max_humidity"),
+            "critical_min_temp": atmosphere_data.get("critical_min_temp"),
+            "critical_max_temp": atmosphere_data.get("critical_max_temp"),
+            "temp_sensor": atmosphere_data.get("temp_sensor"),
+            "humidity_sensor": atmosphere_data.get("humidity_sensor"),
+        }
